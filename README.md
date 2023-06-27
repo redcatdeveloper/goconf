@@ -1,2 +1,2 @@
 # goconf
-Go module for read config files
+Go module for reading config files
