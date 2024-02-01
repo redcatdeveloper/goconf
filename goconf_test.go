@@ -5,7 +5,7 @@ import (
 )
 
 func TestSplitLine(t *testing.T) {
-	conf := &goConf{}
+	conf := NewGoConf()
 	str := "Test = 12"
 	key, value := conf.splitLine(str)
 	if key != "Test" {

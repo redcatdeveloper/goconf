@@ -10,20 +10,22 @@ import (
 type inidata map[string]string
 
 type goConf struct {
-	Filename string `config.ini`
-	data     inidata
+	data inidata
 }
 
-func NewGoConf(filename string) (*goConf, error) {
+func NewGoConf() *goConf {
 	conf := &goConf{
-		Filename: filename,
-		data:     inidata{},
+		data: inidata{},
 	}
-	_, err := conf.parseFile()
+	return conf
+}
+
+func (conf *goConf) LoadFile(filename string) bool {
+	_, err := conf.parseFile(filename)
 	if err != nil {
-		return nil, err
+		return false
 	}
-	return conf, nil
+	return true
 }
 
 func (conf *goConf) Get(param string) string {
@@ -34,8 +36,8 @@ func (conf *goConf) Get(param string) string {
 	return ""
 }
 
-func (conf *goConf) parseFile() (bool, error) {
-	f, err := os.OpenFile(conf.Filename, os.O_RDONLY, 0666)
+func (conf *goConf) parseFile(filename string) (bool, error) {
+	f, err := os.OpenFile(filename, os.O_RDONLY, 0666)
 	if err != nil {
 		log.Print(err)
 		return false, err
