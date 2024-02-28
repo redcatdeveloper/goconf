@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 	"strings"
+	"strconv"
+	"errors"
 )
 
 type inidata map[string]string
@@ -32,8 +34,20 @@ func (conf *goConf) Get(param string) string {
 	value, ok := conf.data[param]
 	if ok {
 		return value
+	} else {
+		log.Printf("Not found key \"%s\"", param)
 	}
 	return ""
+}
+
+func (conf *goConf) GetInt(param string) (val int, err error) {
+	value := conf.Get(param)
+	if value != "" {
+		val, err = strconv.Atoi(value)
+		return
+	}
+	err = errors.New("Empty value for " + param)
+	return
 }
 
 func (conf *goConf) parseFile(filename string) (bool, error) {
