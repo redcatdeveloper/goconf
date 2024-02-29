@@ -2,11 +2,11 @@ package goconf
 
 import (
 	"bufio"
+	"errors"
 	"log"
 	"os"
-	"strings"
 	"strconv"
-	"errors"
+	"strings"
 )
 
 type inidata map[string]string
@@ -30,23 +30,51 @@ func (conf *goConf) LoadFile(filename string) bool {
 	return true
 }
 
-func (conf *goConf) Get(param string) string {
-	value, ok := conf.data[param]
-	if ok {
-		return value
-	} else {
+/**
+Get string value from config by name
+**/
+func (conf *goConf) Get(param string) (val string, err error) {
+	val, ok := conf.data[param]
+	if !ok {
+		err = errors.New("Not found key: " + param)
 		log.Printf("Not found key \"%s\"", param)
 	}
-	return ""
+	return
 }
 
+/**
+Get int value from config by name
+**/
 func (conf *goConf) GetInt(param string) (val int, err error) {
-	value := conf.Get(param)
-	if value != "" {
-		val, err = strconv.Atoi(value)
+	var value string
+	value, err = conf.Get(param)
+	if err != nil {
+		log.Print(err)
 		return
 	}
-	err = errors.New("Empty value for " + param)
+	if value == "" {
+		err = errors.New("Empty value for " + param)
+		log.Print(err)
+	}
+	val, err = strconv.Atoi(value)
+	return
+}
+
+func (conf *goConf) GetArray(param string, options ...string) (val []string, err error) {
+	var value, sep string
+	sep = ";"
+	value, err = conf.Get(param)
+	if err != nil {
+		log.Print(err)
+		return
+	}
+	if value == "" {
+		return
+	}
+	if len(options) > 0 {
+		sep = options[0]
+	}
+	val = strings.Split(value, sep)
 	return
 }
 
